@@ -64,7 +64,8 @@ class MediaFile():
         self.path = path
 
     def source(self):
-        return Base64String.encode(self.path)
+        bytes_path = self.path.encode('utf-8', 'surrogateescape')
+        return Base64String.encode(bytes_path)
 
     def kind(self):
         ext = self.extension()
@@ -108,18 +109,17 @@ class Base64String:
     """Base64 string encoding helper"""
 
     @staticmethod
-    def encode(string):
-        """Encode to base64 string"""
-        bytes_string = string.encode('utf-8', 'surrogateescape')
-        encoded_bytes = base64.urlsafe_b64encode(bytes_string)
+    def encode(input_bytes):
+        """Encode bytes to base64 string"""
+        encoded_bytes = base64.urlsafe_b64encode(input_bytes)
         return encoded_bytes.decode('utf-8')
 
     @staticmethod
-    def decode(string):
-        """Decode base64 to original string"""
-        bytes_string = string.encode('utf-8')
+    def decode(input_str):
+        """Decode base64 string to bytes"""
+        bytes_string = input_str.encode('utf-8')
         decoded_bytes = base64.urlsafe_b64decode(bytes_string)
-        return decoded_bytes.decode('utf-8', 'surrogateescape')
+        return decoded_bytes
 
 
 class MediaStreamer:
@@ -127,6 +127,7 @@ class MediaStreamer:
 
     def __init__(self, path):
         self._path = path
+        self._string_path = path.decode('utf8', 'surrogateescape')
 
     def respond(self, request):
         media_file = self._open_file()
@@ -137,7 +138,7 @@ class MediaStreamer:
         return open(self._path, 'rb')
 
     def _guess_content_type(self):
-        (content_type, _encoding) = mimetypes.guess_type(self._path)
+        (content_type, _encoding) = mimetypes.guess_type(self._string_path)
         return content_type
 
     def _create_ranged_response(self, request, media_file, content_type):
@@ -146,4 +147,4 @@ class MediaStreamer:
         return response
 
     def _add_content_disposition(self, response):
-        response['Content-Disposition'] = 'attachment; filename="%s"' % self._path
+        response['Content-Disposition'] = 'attachment; filename="%s"' % self._string_path
