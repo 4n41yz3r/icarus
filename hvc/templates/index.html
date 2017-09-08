@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Home Media Catalog</title>
+
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+	<link rel="stylesheet" href="https://www.bootswatch.com/yeti/bootstrap.min.css">
+	<style>
+		body {
+			padding-top: 46px;
+			padding-bottom: 20px;
+		}
+		video { 
+			width: 100%;
+			height: auto;
+			background-color: #fafafa;
+		}
+		audio {
+			width: 100%;
+		}
+		#learn-more-alert {
+			display: none;
+		}
+		.jumbotron {
+			background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
+		}
+	</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+				 aria-controls="navbar">
+		<span class="sr-only">Toggle navigation</span>
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+		</button>
+				<a class="navbar-brand" href="#">Home Media Catalog</a>
+			</div>
+			<div id="navbar" class="navbar-collapse collapse">
+				<form class="navbar-form navbar-right" role="form">
+					<div class="form-group">
+						<input type="text" placeholder="Email" class="form-control">
+					</div>
+					<div class="form-group">
+						<input type="password" placeholder="Password" class="form-control">
+					</div>
+					<button type="submit" class="btn btn-success">Sign in</button>
+				</form>
+			</div>
+		</div>
+	</nav>
+
+	<div class="jumbotron">
+		<div class="container">
+			<h1>Vuyadin - Home Media Catalog</h1>
+			<p>
+				The best place for your favorite media experience.
+			</p>
+			<p>
+				<a id="learn-more-button" class="btn btn-primary btn-lg">Learn more</a>
+			</p>
+			<div id="learn-more-alert" class="alert alert-dismissible alert-success">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				Actually, there is nothing else to learn... It's a stupid video catalog! Duh!
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+
+		{% for item in items %}
+			<div class="row">
+				<div class="col-xs-12">
+					<h2>{{ item.title }}</h2>
+					<div class="row">
+						{% for f in item.files %}
+	
+							{% if f.kind == 'video' %}
+							<div class="col-md-6 col-lg-6">		
+								<video preload="none" controls>
+									<source src="{% url 'stream' f.source %}" type="video/mp4">
+								</video>
+								<p>
+									{{ f.name }}
+								</p>
+							</div>
+							{% endif %}
+
+							{% if f.kind == 'audio' %}
+							<div class="col-lg-12">
+								<div class="row">
+									<div class="col-md-6 col-lg-4">
+										<audio preload="none" controls>
+											<source src="{% url 'stream' f.source %}" type="audio/mp3">
+										</audio>
+									</div>
+									<div class="col-md-6 col-lg-6">
+										<p>
+											{{ f.name }}
+										</p>
+									</div>
+								</div>
+							</div>
+							{% endif %}
+	
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+
+		<hr>
+
+		<footer>
+			<p>&copy; Milosh 2017</p>
+		</footer>
+
+		<div class="alert alert-dismissible alert-warning">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<h4>Warning!</h4>
+			<p>
+				This website does not use any cookies whatsoever!
+				No need to click <a href="#" class="alert-link">anywhere</a> nor waste your life on reading some random piece of legal bullshit.
+				You are welcome!
+			</p>
+		</div>
+	</div>
+	
+
+	<script>
+		$('#learn-more-button').click(function (e) {
+			$('#learn-more-alert').show();
+		});
+	</script>
+
+</body>
+
+</html>
