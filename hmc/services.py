@@ -14,17 +14,19 @@ class Catalog():
         self.items = list(self._load_items())
 
     def _load_items(self):
-        folders = self._list_folders()
-        return self._project_into_items(folders)
+        paths = self._list_folder_content()
+        return self._project_into_items(paths)
 
-    def _list_folders(self):
-        (root, folders, _files) = next(os.walk(self._path))
+    def _list_folder_content(self):
+        (root, folders, files) = next(os.walk(self._path))
+        for file in sorted(files):
+            yield os.path.join(root, file)
         for folder in sorted(folders):
             yield os.path.join(root, folder)
 
-    def _project_into_items(self, folder_list):
-        for folder in folder_list:
-            yield MediaItem(folder)
+    def _project_into_items(self, path_list):
+        for path in path_list:
+            yield MediaItem(path)
 
 
 class MediaItem():
@@ -40,12 +42,16 @@ class MediaItem():
 
     @staticmethod
     def _get_files(path):
-        for (root, _folders, files) in os.walk(path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                media = MediaFile(file_path)
-                if MediaItem._should_display_media(media):
-                    yield MediaViewModel(media)
+        if os.path.isdir(path):
+            for (root, _folders, files) in os.walk(path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    media = MediaFile(file_path)
+                    if MediaItem._should_display_media(media):
+                        yield MediaViewModel(media)
+        else:
+            media = MediaFile(path)
+            yield MediaViewModel(media)
 
     @staticmethod
     def _should_display_media(media):
@@ -53,7 +59,7 @@ class MediaItem():
 
     @staticmethod
     def _normalize(string):
-        regex_filter = r'\W+|_|1080p|720p|540p|mp4|h264|aac|bluray|web-dl|split scenes|rarbg'
+        regex_filter = r'\W+|_|1080p|720p|540p|480p|mp4|h264|aac|bluray|web-dl|split scenes|rarbg'
         return re.sub(regex_filter, ' ', string, flags=re.IGNORECASE).strip()
 
 
@@ -79,10 +85,9 @@ class MediaFile():
         return os.path.basename(self.path)
 
     def length(self):
-        file = open(self.path, 'rb')
-        length = file.seek(0, 2)
-        file.close()
-        return length
+        with open(self.path, 'rb') as file:
+            length = file.seek(0, 2)
+            return length
 
     def is_media(self):
         ext = self.extension()
