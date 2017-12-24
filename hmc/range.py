@@ -139,5 +139,5 @@ class RangedFileResponse(FileResponse):
             self.ranged_file.start = start
             self.ranged_file.stop = stop
             self['Content-Range'] = 'bytes %d-%d/%d' % (start, stop - 1, size)
-            self['Content-Length'] = stop - start
+            #self['Content-Length'] = stop - start
             self.status_code = 206
