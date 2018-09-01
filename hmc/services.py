@@ -6,8 +6,61 @@ import base64
 import mimetypes
 from .range import RangedFileResponse
 
+
+class CatalogViewModel():
+    def __init__(self, catalog, kind = None):
+        items = map(lambda item: ItemViewModel(item, kind), catalog.items)
+        filtered_items = CatalogViewModel._filter(items, kind)
+        self.items = list(filtered_items)
+
+    @staticmethod
+    def _filter(items, kind):
+        return filter(lambda i: kind is None or i.kind == kind or i.kind == 'mixed', items)
+
+class ItemViewModel():
+    def __init__(self, media_item, kind):
+        self.title = ItemViewModel._normalize_title(media_item.title)
+        files = map(lambda media_file: FileViewModel(media_file), media_item.files)
+        filtered_files = ItemViewModel._filter(files, kind)
+        self.files = list(filtered_files)
+        file_kinds = list(set(map(lambda file: file.kind, self.files)))
+        self.kind = ItemViewModel._get_item_kind(file_kinds)
+
+    @staticmethod
+    def _normalize_title(string):
+        regex_filter = r'\W+|_|1080p|720p|540p|480p|mp4|h264|aac|bluray|web-dl|split scenes|rarbg'
+        return re.sub(regex_filter, ' ', string, flags=re.IGNORECASE).strip()
+
+    @staticmethod
+    def _filter(files, kind):
+        return filter(lambda i: kind is None or i.kind == kind, files)
+
+    @staticmethod
+    def _get_item_kind(kinds):
+        if 'audio' in kinds and 'video' in kinds:
+            return 'mixed'
+        if 'audio' in kinds:
+             return 'audio'
+        if 'video' in kinds:
+            return 'video'
+        return 'empty'
+
+
+class FileViewModel():
+    def __init__(self, media_file):
+        self.name = FileViewModel._normalize_name(media_file.file_name())
+        self.source = media_file.source()
+        self.kind = media_file.kind()
+
+    @staticmethod
+    def _normalize_name(string):
+        string = re.sub(r'-', ' - ', string)
+        string = re.sub(r'\.[^\. ]+$|[ _\.]+', ' ', string.lower()).strip()
+        return string.encode('utf-8', 'surrogateescape') #errors='replace'
+
+
 class Catalog():
-    """Catalog service used to load video items"""
+    """Catalog service used to load media items"""
 
     def __init__(self, path):
         self._path = path
@@ -33,7 +86,7 @@ class MediaItem():
     """Single item item in the catalog"""
 
     def __init__(self, path):
-        self.title = MediaItem._normalize(MediaItem._get_file_name(path))
+        self.title = MediaItem._get_file_name(path)
         self.files = MediaItem._get_files(path)
 
     @staticmethod
@@ -48,19 +101,14 @@ class MediaItem():
                     file_path = os.path.join(root, file)
                     media = MediaFile(file_path)
                     if MediaItem._should_display_media(media):
-                        yield MediaViewModel(media)
+                        yield media
         else:
             media = MediaFile(path)
-            yield MediaViewModel(media)
+            yield media
 
     @staticmethod
     def _should_display_media(media):
         return media.is_media() and media.length() > 1024 * 1024
-
-    @staticmethod
-    def _normalize(string):
-        regex_filter = r'\W+|_|1080p|720p|540p|480p|mp4|h264|aac|bluray|web-dl|split scenes|rarbg'
-        return re.sub(regex_filter, ' ', string, flags=re.IGNORECASE).strip()
 
 
 class MediaFile():
@@ -95,19 +143,6 @@ class MediaFile():
 
     def extension(self):
         return self.path[-3:].lower()
-
-
-class MediaViewModel():
-    def __init__(self, media):
-        self.name = MediaViewModel._normalize_name(media.file_name())
-        self.source = media.source()
-        self.kind = media.kind()
-
-    @staticmethod
-    def _normalize_name(string):
-        string = re.sub(r'-', ' - ', string)
-        string = re.sub(r'\.[^\. ]+$|[ _\.]+', ' ', string.lower()).strip()
-        return string.encode('utf-8', 'surrogateescape') #errors='replace'
 
 
 class Base64String:
