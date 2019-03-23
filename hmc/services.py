@@ -4,6 +4,7 @@ import os
 import re
 import base64
 import mimetypes
+import json
 from .range import RangedFileResponse
 
 
@@ -19,6 +20,8 @@ class CatalogViewModel():
 
     @staticmethod
     def _filter(items, query):
+        if 'hidden' not in query:
+            items = filter(lambda i: not i.hidden, items)
         if 'kind' in query:
             kind = query['kind']
             items = filter(lambda i: i.kind == kind or i.kind == 'mixed', items)
@@ -30,10 +33,12 @@ class ItemViewModel():
         self.files = ItemViewModel._get_files(media_item, query)
         self.title = ItemViewModel._normalize_title(media_item.title)
         self.kind = ItemViewModel._get_item_kind(self.files)
+        self.hidden = 'hidden' in media_item.meta \
+            and media_item.meta['hidden'] == True
     
     @staticmethod
     def _get_files(media_item, query):
-        files = map(lambda media_file: FileViewModel(media_file), media_item.files)
+        files = map(lambda f: FileViewModel(f), media_item.files)
         filtered_files = ItemViewModel._filter(files, query)
         return list(filtered_files)
 
@@ -103,6 +108,7 @@ class MediaItem():
     def __init__(self, path):
         self.title = MediaItem._file_name(path)
         self.files = MediaItem._files(path)
+        self.meta = MediaItem._metadata(path)
 
     @staticmethod
     def _file_name(path):
@@ -120,6 +126,15 @@ class MediaItem():
         else:
             media = MediaFile(path)
             yield media
+
+    @staticmethod
+    def _metadata(path):
+        meta_path = '{0}/meta.json'.format(path)
+        if os.path.exists(meta_path):
+            with open(meta_path, "r") as meta_file:
+                serialized_meta = meta_file.read()
+                return json.loads(serialized_meta)
+        return dict()
 
     @staticmethod
     def _should_include(media):
