@@ -6,10 +6,6 @@ class MediaFileTest(TestCase):
     def setUp(self):
         self.sut = MediaFile('c:/dir/file.ext')
 
-    def test_source_returns_string(self):
-        src = self.sut.source()
-        self.assertTrue(isinstance(src, str))
-
     def test_source_returns_base64_encoded_url(self):
         src = self.sut.source()
         self.assertEqual(src, 'YzovZGlyL2ZpbGUuZXh0')
