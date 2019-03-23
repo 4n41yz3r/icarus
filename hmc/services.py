@@ -17,6 +17,7 @@ class CatalogViewModel():
     def _filter(items, kind):
         return filter(lambda i: kind is None or i.kind == kind or i.kind == 'mixed', items)
 
+
 class ItemViewModel():
     def __init__(self, media_item, kind):
         self.title = ItemViewModel._normalize_title(media_item.title)
@@ -118,8 +119,8 @@ class MediaFile():
         self.path = path
 
     def source(self):
-        bytes_path = self.path.encode('utf-8', 'surrogateescape')
-        return Base64String.encode(bytes_path)
+        path_bytes = self.path.encode('utf-8', 'surrogateescape')
+        return Base64String.encode(path_bytes)
 
     def kind(self):
         ext = self.extension()
@@ -171,20 +172,20 @@ class MediaStreamer:
 
     def respond(self, request):
         media_file = self._open_file()
-        content_type = self._guess_content_type()
-        return self._create_ranged_response(request, media_file, content_type)
+        return self._create_ranged_response(request, media_file)
 
     def _open_file(self):
         return open(self._path, 'rb')
 
-    def _guess_content_type(self):
-        (content_type, _encoding) = mimetypes.guess_type(self._string_path)
-        return content_type
-
-    def _create_ranged_response(self, request, media_file, content_type):
+    def _create_ranged_response(self, request, media_file):
+        content_type = self._guess_content_type()
         response = RangedFileResponse(request, media_file, content_type=content_type)
         self._add_content_disposition(response)
         return response
+
+    def _guess_content_type(self):
+        (content_type, _encoding) = mimetypes.guess_type(self._string_path)
+        return content_type
 
     def _add_content_disposition(self, response):
         response['Content-Disposition'] = 'attachment; filename="%s"' % self._string_path
