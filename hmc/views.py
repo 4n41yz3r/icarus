@@ -5,7 +5,6 @@ from django.http import HttpResponse
 from django.views import View
 from .services import Catalog
 from .services import CatalogViewModel
-from .services import Base64String
 from .services import MediaStreamer
 
 class CatalogView(View):
@@ -17,7 +16,6 @@ class CatalogView(View):
 
 
 class StreamView(View):
-    def get(self, request, base64_media_path):
-        path = Base64String.decode(base64_media_path)
-        streamer = MediaStreamer(path)
+    def get(self, request, base64_file_path):
+        streamer = MediaStreamer(base64_file_path)
         return streamer.respond(request)
