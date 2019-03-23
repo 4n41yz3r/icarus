@@ -87,28 +87,28 @@ class MediaItem():
     """Single item item in the catalog"""
 
     def __init__(self, path):
-        self.title = MediaItem._get_file_name(path)
-        self.files = MediaItem._get_files(path)
+        self.title = MediaItem._file_name(path)
+        self.files = MediaItem._files(path)
 
     @staticmethod
-    def _get_file_name(path):
+    def _file_name(path):
         return os.path.basename(path)
 
     @staticmethod
-    def _get_files(path):
+    def _files(path):
         if os.path.isdir(path):
             for (root, _folders, files) in os.walk(path):
                 for file in files:
                     file_path = os.path.join(root, file)
                     media = MediaFile(file_path)
-                    if MediaItem._should_display_media(media):
+                    if MediaItem._should_include(media):
                         yield media
         else:
             media = MediaFile(path)
             yield media
 
     @staticmethod
-    def _should_display_media(media):
+    def _should_include(media):
         return media.is_media() and media.length() > 1024 * 1024
 
 
@@ -122,6 +122,13 @@ class MediaFile():
         path_bytes = self.path.encode('utf-8', 'surrogateescape')
         return Base64String.encode(path_bytes)
 
+    def file_name(self):
+        return os.path.basename(self.path)
+
+    def length(self):
+        with open(self.path, 'rb') as file:
+            return file.seek(0, 2)
+
     def kind(self):
         ext = self.extension()
         if ext == 'mp4':
@@ -130,17 +137,8 @@ class MediaFile():
             return 'audio'
         return 'unknown'
 
-    def file_name(self):
-        return os.path.basename(self.path)
-
-    def length(self):
-        with open(self.path, 'rb') as file:
-            length = file.seek(0, 2)
-            return length
-
     def is_media(self):
-        ext = self.extension()
-        return ext == 'mp4' or ext == 'mp3'
+        return self.kind() != 'unknown'
 
     def extension(self):
         return self.path[-3:].lower()
