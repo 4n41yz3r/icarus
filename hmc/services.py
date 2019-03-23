@@ -8,21 +8,24 @@ from .range import RangedFileResponse
 
 
 class CatalogViewModel():
-    def __init__(self, catalog, kind = None):
-        items = map(lambda item: ItemViewModel(item, kind), catalog.items)
-        filtered_items = CatalogViewModel._filter(items, kind)
+    def __init__(self, catalog, query):
+        items = map(lambda item: ItemViewModel(item, query), catalog.items)
+        filtered_items = CatalogViewModel._filter(items, query)
         self.items = list(filtered_items)
 
     @staticmethod
-    def _filter(items, kind):
-        return filter(lambda i: kind is None or i.kind == kind or i.kind == 'mixed', items)
+    def _filter(items, query):
+        if ('kind' in query):
+            kind = query['kind']
+            items = filter(lambda i: i.kind == kind or i.kind == 'mixed', items)
+        return items
 
 
 class ItemViewModel():
-    def __init__(self, media_item, kind):
+    def __init__(self, media_item, query):
         self.title = ItemViewModel._normalize_title(media_item.title)
         files = map(lambda media_file: FileViewModel(media_file), media_item.files)
-        filtered_files = ItemViewModel._filter(files, kind)
+        filtered_files = ItemViewModel._filter(files, query)
         self.files = list(filtered_files)
         file_kinds = list(set(map(lambda file: file.kind, self.files)))
         self.kind = ItemViewModel._get_item_kind(file_kinds)
@@ -33,8 +36,11 @@ class ItemViewModel():
         return re.sub(regex_filter, ' ', string, flags=re.IGNORECASE).strip()
 
     @staticmethod
-    def _filter(files, kind):
-        return filter(lambda i: kind is None or i.kind == kind, files)
+    def _filter(files, query):
+        if ('kind' in query):
+            kind = query['kind']
+            files = filter(lambda i: i.kind == kind, files)
+        return files
 
     @staticmethod
     def _get_item_kind(kinds):

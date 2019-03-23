@@ -10,11 +10,9 @@ from .services import MediaStreamer
 
 class CatalogView(View):
     def get(self, request):
-        kind = request.GET.get('kind')
-        cat = Catalog('/home/pi/downloads')
-        cat_vm = CatalogViewModel(cat, kind)
+        catalog = Catalog('/home/pi/downloads')
         return render(request, 'index.html', {
-            'items': cat_vm.items
+            'catalog': CatalogViewModel(catalog, request.GET)
         })
 
 
