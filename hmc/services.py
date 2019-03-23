@@ -49,7 +49,7 @@ class ItemViewModel():
 
 class FileViewModel():
     def __init__(self, media_file):
-        self.name = FileViewModel._normalize_name(media_file.file_name())
+        self.name = FileViewModel._normalize_name(media_file.name())
         self.source = media_file.source()
         self.kind = media_file.kind()
 
@@ -122,8 +122,8 @@ class MediaFile():
         path_bytes = self.path.encode('utf-8', 'surrogateescape')
         return Base64String.encode(path_bytes)
 
-    def file_name(self):
-        return os.path.basename(self.path)
+    def name(self):
+        return os.path.splitext(os.path.basename(self.path))[0]
 
     def length(self):
         with open(self.path, 'rb') as file:

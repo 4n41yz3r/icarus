@@ -23,8 +23,8 @@ class MediaFileTest(TestCase):
     def test_kind_returns_audio_for_audio_extensions(self):
         self.assertEqual(MediaFile('a.mp3').kind(), 'audio')
 
-    def test_file_name_returns_expected(self):
-        self.assertEqual(self.sut.file_name(), 'file.ext')
+    def test_name_returns_expected(self):
+        self.assertEqual(self.sut.name(), 'file')
 
     def test_extension_returns_expected_value(self):
         self.assertEqual(self.sut.extension(), 'ext')
