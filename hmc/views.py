@@ -3,9 +3,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views import View
-from .services import Catalog
-from .services import CatalogViewModel
-from .services import MediaStreamer
+from .domain import Catalog
+from .domain import MediaStreamer
+from .view_model import CatalogViewModel
+
 
 class CatalogView(View):
     def get(self, request):

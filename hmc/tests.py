@@ -1,5 +1,5 @@
 from unittest import TestCase
-from .services import MediaFile
+from .domain import MediaFile
 
 # Create your tests here.
 class MediaFileTest(TestCase):
