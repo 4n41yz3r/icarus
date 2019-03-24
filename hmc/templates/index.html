@@ -22,6 +22,9 @@
 		audio {
 			width: 100%;
 		}
+		.list-item-padding > li {
+			padding: 4px;
+		}
 		#learn-more-alert {
 			display: none;
 		}
@@ -66,16 +69,16 @@
 
 	<div class="jumbotron">
 		<div class="container">
-			<h1>Vuyadin - Home Media Catalog</h1>
+			<h1>Home Media Catalog</h1>
 			<p>
 				The best place for your favorite media experience.
 			</p>
-			<p>
-				<a href="/" class="btn btn-primary btn-lg">All Media</a>
-				<a href="/?kind=video" class="btn btn-primary btn-lg">Video</a>
-				<a href="/?kind=audio" class="btn btn-primary btn-lg">Audio</a>
-				<a id="learn-more-button" class="btn btn-success btn-lg">Learn more</a>
-			</p>
+			<ul class="list-inline list-item-padding">
+				<li><a href="/" class="btn btn-primary btn-lg">All Media</a></li><!--
+				--><li><a href="/?kind=video" class="btn btn-primary btn-lg">Video</a></li><!--
+				--><li><a href="/?kind=audio" class="btn btn-primary btn-lg">Audio</a></li><!--
+				--><li><a id="learn-more-button" class="btn btn-success btn-lg">Learn more</a></li>
+			</ul>
 			<div id="learn-more-alert" class="alert alert-dismissible alert-success">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
 				Actually, there is nothing else to learn... It's a stupid media catalog! Duh!
