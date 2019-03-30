@@ -9,11 +9,23 @@ from .view_model import CatalogViewModel
 
 
 class CatalogView(View):
+    def __init__(self):
+        self.catalog = Catalog('/home/pi/downloads')
+
     def get(self, request):
-        catalog = Catalog('/home/pi/downloads')
         return render(request, 'index.html', {
-            'catalog': CatalogViewModel(catalog, request.GET)
+            'catalog': CatalogViewModel(self.catalog, request.GET)
         })
+    
+    def post(self, request):
+        command = request.POST.get('command', '')
+        self.execute_command(command, request.POST)
+        return self.get(request)
+    
+    def execute_command(self, command, params):
+        if command == 'hide':
+            item_id = params.get('id', '')
+            self.catalog.hide_item(item_id)
 
 
 class StreamView(View):

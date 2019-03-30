@@ -3,6 +3,7 @@ from .file_vm import FileViewModel
 
 class ItemViewModel():
     def __init__(self, media_item, query):
+        self.id = media_item.id
         self.files = ItemViewModel._get_files(media_item, query)
         self.title = ItemViewModel._normalize_title(media_item.title)
         self.kind = ItemViewModel._get_item_kind(self.files)

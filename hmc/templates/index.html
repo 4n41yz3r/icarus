@@ -6,9 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Home Media Catalog</title>
-
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 	<link rel="stylesheet" href="https://bootswatch.com/3/yeti/bootstrap.min.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 	<style>
 		body {
 			padding-top: 46px;
@@ -31,6 +30,18 @@
 		.jumbotron {
 			background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
 		}
+		.margin-md {
+			margin: 15px;
+		}
+		.padding-button {
+			padding: 4px;
+		}
+		.inline-block {
+			display: inline-block;
+		}
+		.small-font {
+			font-size: 12pt;
+		}
 		video::-webkit-media-controls-overlay-play-button {
 			opacity: 0.5;
 		}
@@ -38,7 +49,6 @@
 			background-image: none;
 		}
 	</style>
-
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
@@ -61,7 +71,7 @@
 					<div class="form-group">
 						<input id="message" type="text" placeholder="Write something..." class="form-control">
 					</div>
-					<button id="shout" type="button" class="btn btn-success">Shout!</button>
+					<button id="shout" type="button" class="btn btn-success"><i class="fas fa-bullhorn"></i> Shout!</button>
 				</form>
 			</div>
 		</div>
@@ -75,9 +85,9 @@
 			</p>
 			<ul class="list-inline list-item-padding">
 				<li><a href="/" class="btn btn-primary btn-lg">All Media</a></li><!--
-				--><li><a href="/?kind=video" class="btn btn-primary btn-lg">Video</a></li><!--
-				--><li><a href="/?kind=audio" class="btn btn-primary btn-lg">Audio</a></li><!--
-				--><li><a id="learn-more-button" class="btn btn-success btn-lg">Learn more</a></li>
+				--><li><a href="/?kind=video" class="btn btn-primary btn-lg"><i class="fas fa-film"></i> Video</a></li><!--
+				--><li><a href="/?kind=audio" class="btn btn-primary btn-lg"><i class="fas fa-headphones"></i> Audio</a></li><!--
+				--><li><a id="learn-more-button" class="btn btn-success btn-lg"><i class="fas fa-info"></i>  Learn More</a></li>
 			</ul>
 			<div id="learn-more-alert" class="alert alert-dismissible alert-success">
 				<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -90,7 +100,18 @@
 		{% for item in catalog.items %}
 			<div class="row">
 				<div class="col-xs-12">
-					<h2>{{ item.title }}</h2>
+					<h2>
+						{{ item.title }}
+						<a href="" data-target="{{ item.id }}" class="toggle-action"><i class="fas fa-pen small-font"></i></a>
+					</h2>
+					<div class="margin-md" id="{{ item.id }}" hidden>
+						<form class="inline-block padding-button" action="" method="POST">
+							{% csrf_token %}
+							<input type="hidden" name="command" value="hide">
+							<input type="hidden" name="id" value="{{ item.id }}">
+							<button type="submit" class="btn btn-primary"><i class="fas fa-eye-slash"></i> Hide Item</button>
+						</form>
+					</div>
 					<div class="row">
 						{% for f in item.files %}
 	
@@ -144,15 +165,35 @@
 			</p>
 		</div>
 	</div>
-	
 
 	<script>
 		$('#learn-more-button').click(function (e) {
 			$('#learn-more-alert').show();
 		});
-		$('#shout').click(function(e) {
+		$('#shout').click(function (e) {
 			alert($('#message').val());
 			$('#message').val('');
+		});
+		$('.toggle-action').click(function (e) {
+			var id = $(e.currentTarget).attr('data-target');
+			var element = $('#' + id);
+			if (element.is(':hidden')) {
+				element.show();
+			}
+			else {
+				element.hide();
+			}
+			e.preventDefault();
+		});
+		$('.show-action').click(function (e) {
+			var id = $(e.currentTarget).attr('data-target');
+			$('#' + id).show();
+			e.preventDefault();
+		});
+		$('.hide-action').click(function (e) {
+			var id = $(e.currentTarget).attr('data-target');
+			$('#' + id).hide();
+			e.preventDefault();
 		});
 	</script>
 
