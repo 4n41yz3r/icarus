@@ -67,11 +67,11 @@
 				<a class="navbar-brand" href="#">Home Media Catalog</a>
 			</div>
 			<div id="navbar" class="navbar-collapse collapse">
-				<form class="navbar-form navbar-right" role="form">
+				<form id="commandForm" class="navbar-form navbar-right" role="form">
 					<div class="form-group">
-						<input id="message" type="text" placeholder="Write something..." class="form-control">
+						<input id="command" type="text" placeholder="Enter command..." class="form-control">
 					</div>
-					<button id="shout" type="button" class="btn btn-success"><i class="fas fa-bullhorn"></i> Shout!</button>
+					<button id="execute" type="submit" class="btn btn-success"><i class="fas fa-bolt"></i> Execute</button>
 				</form>
 			</div>
 		</div>
@@ -170,10 +170,16 @@
 		$('#learn-more-button').click(function (e) {
 			$('#learn-more-alert').show();
 		});
-		$('#shout').click(function (e) {
-			alert($('#message').val());
-			$('#message').val('');
+		$('#commandForm').submit(function (e) {
+			e.preventDefault();
+			var command = $('#command').val(); $('#command').val('');
+			var search = new URLSearchParams(window.location.search);
+			tuple = command.split('=');
+			search.set(tuple[0], tuple[1] || 'true');
+			window.location.search = search.toString();
 		});
+ 
+		// Unobtrusive show/hide actions
 		$('.toggle-action').click(function (e) {
 			var id = $(e.currentTarget).attr('data-target');
 			var element = $('#' + id);
