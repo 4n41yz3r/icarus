@@ -9,14 +9,20 @@ class Catalog():
         self.items = list(self._load_items())
 
     def hide_item(self, item_id):
-        for item in self.items:
-            if item.id == item_id:
-                item.hide()
-                break
-
+        self._get_item(item_id).hide()
+    
+    def unhide_item(self, item_id):
+        self._get_item(item_id).unhide()
+    
     def _load_items(self):
         paths = self._list_folder_content()
         return self._project_into_items(paths)
+    
+    def _get_item(self, item_id):
+        for item in self.items:
+            if item.id == item_id:
+                return item
+        return None
 
     def _list_folder_content(self):
         (root, folders, files) = next(os.walk(self.path))

@@ -24,8 +24,11 @@ class CatalogView(View):
     
     def execute_command(self, command, params):
         if command == 'hide':
-            item_id = params.get('id', '')
-            self.catalog.hide_item(item_id)
+            self.catalog.hide_item(params.get('id'))
+        elif command == 'unhide':
+            self.catalog.unhide_item(params.get('id'))
+        else:
+            raise ValueError('Unrecognized command.')
 
 
 class StreamView(View):

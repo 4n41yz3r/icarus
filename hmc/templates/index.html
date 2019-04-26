@@ -100,17 +100,27 @@
 		{% for item in catalog.items %}
 			<div class="row">
 				<div class="col-xs-12">
-					<h2>
+					<h2 class="{% if item.hidden %}text-muted{% endif %}">
 						{{ item.title }}
 						<a href="" data-target="{{ item.id }}" class="toggle-action"><i class="fas fa-pen small-font"></i></a>
 					</h2>
 					<div class="margin-md" id="{{ item.id }}" hidden>
+						{% if item.hidden == False %}
 						<form class="inline-block padding-button" action="" method="POST">
 							{% csrf_token %}
 							<input type="hidden" name="command" value="hide">
 							<input type="hidden" name="id" value="{{ item.id }}">
 							<button type="submit" class="btn btn-primary"><i class="fas fa-eye-slash"></i> Hide Item</button>
 						</form>
+						{% endif %}
+						{% if item.hidden %}
+						<form class="inline-block padding-button" action="" method="POST">
+							{% csrf_token %}
+							<input type="hidden" name="command" value="unhide">
+							<input type="hidden" name="id" value="{{ item.id }}">
+							<button type="submit" class="btn btn-primary"><i class="fas fa-eye"></i> Unhide Item</button>
+						</form>
+						{% endif %}
 					</div>
 					<div class="row">
 						{% for f in item.files %}

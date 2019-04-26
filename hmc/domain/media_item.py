@@ -17,6 +17,10 @@ class MediaItem():
     def hide(self):
         self.meta['hidden'] = True
         self._save_meta()
+    
+    def unhide(self):
+        self.meta['hidden'] = False
+        self._save_meta()
 
     def _get_id(self):
         return hashlib.md5(Base64.string_to_bytes(self.path)).hexdigest()
