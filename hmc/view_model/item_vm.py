@@ -1,4 +1,4 @@
-import re
+from .name_normalizer import NameNormalizer
 from .file_vm import FileViewModel
 
 class ItemViewModel():
@@ -18,8 +18,7 @@ class ItemViewModel():
 
     @staticmethod
     def _normalize_title(string):
-        regex_filter = r'\W+|_|1080p|720p|540p|480p|mp4|h264|aac|bluray|web-dl|split scenes|rarbg'
-        return re.sub(regex_filter, ' ', string, flags=re.IGNORECASE).strip()
+        return NameNormalizer.normalize(string)
 
     @staticmethod
     def _get_item_kind(files):

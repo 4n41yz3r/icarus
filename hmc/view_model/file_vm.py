@@ -1,4 +1,5 @@
 import re
+from .name_normalizer import NameNormalizer
 
 class FileViewModel():
     def __init__(self, media_file):
@@ -8,6 +9,4 @@ class FileViewModel():
 
     @staticmethod
     def _normalize_name(string):
-        string = re.sub(r'-', ' - ', string)
-        string = re.sub(r'\.[^\. ]+$|[ _\.]+', ' ', string.lower()).strip()
-        return string.encode('utf-8', 'surrogateescape') #errors='replace'
+        return NameNormalizer.normalize_file(string)
